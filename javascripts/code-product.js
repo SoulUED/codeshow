@@ -133,11 +133,10 @@
 
     }
 
-    rule_parsing(document.body)('div.class[type="text"] > input.text[type="text"] + div.text');
-    rule_parsing(document.body)('div.class[type="text"] > input.text[type="text"] + div.text');
     exports.mv_code = rule_parsing;
 })(window);
 
+mv_code(document.body)('div.class[type="text"] > input.text[type="text"] + div.text');
 
 
 
