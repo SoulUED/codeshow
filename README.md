@@ -1,6 +1,5 @@
 
 UI,HTML代码生成
-
 ===================================
 
 仅仅基于emmet + > 制作
@@ -38,4 +37,4 @@ div.text#id[data-value="example"] > div + div > div > input
 
     mv_code(docunemt.body)("div.class[type="text"] > input.text[type="text"] + div.text");
 
-    将生成的代码插入到bod
+    将生成的代码插入到body中
