@@ -14,8 +14,8 @@ UI,HTML代码生成
 引入
 ---------------------------------------------------
 
-<link rel="stylesheet" href="css/tag-product.css" />
-<script type="text/javascript" src="javascripts/code-product.js"></script>
+        <link rel="stylesheet" href="css/tag-product.css" />
+        <script type="text/javascript" src="javascripts/code-product.js"></script>
 
 
 语法规则
