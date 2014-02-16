@@ -3,17 +3,17 @@
  */
 
 (function (exports) {
-    function rule_parsing (Code) {
+    function rule_parsing (that) {
 
-        var rule_rex = /\s*([a-zA-Z0-9]*)([\.\#]*[a-zA-Z0-9\.\_\-\#]*)([\[*[^\]]*[\]]*]*)([{*[^}]*}*]*)\s*([>\+]*)/,
+        var rule_rex = /\s*([a-zA-Z0-9]*)([\.\#]*[a-zA-Z0-9\.\_\-\#]*)\[*([^\]\+>]*)\]*{*([^}\+>]*)}*\s*([>\+]*)/,
             pause_string,
             code_array = [],
             index = 0,
-            code_location = {};
+            code_location = {},
+            which_ele= that;
 
         return function parsing(code_string){
             if (!code_string) {
-
                 parsing_arr(code_array);
 
                 return;
@@ -26,7 +26,6 @@
             code_array[index].eleAttribute = pause_string[3];
             code_array[index].eleText = pause_string[4];
             code_array[index].eleLocation = pause_string[5];
-
             index+=1;
             pause_string = pause_string[0];
             pause_string = code_string.replace(pause_string,"").replace(/\s*/,"");
@@ -42,19 +41,103 @@
                     code_location["deep" + (i + 1)] = [];
                     code_location["deep" + (i + 1)].push(arr[i + 1])
                 }else if(arr[i].eleLocation === "+"){
-                    console.log(code_location);
                     code_location["deep" + i].push(arr[i+1]);
                 }
             }
-
-            console.log(code_location);
-
-            return code_location;
+            create_ele(code_location);
 
         }
+
+
+        function create_ele (code_location) {
+            var span_ele,
+                d = document,
+                temporary_obj,
+                temporary_text,
+                temporary_arr = [],
+                folding,
+                folding_arr = [],
+                ele_name,
+                framework = d.createDocumentFragment();
+
+            function get_class (icString) {
+                var spl_rex = /([\.#])([a-zA-Z0-9\-\_]*)/,
+                    icString = icString,
+                    icObject = {
+                        id : [],
+                        className : []
+                    },
+                    record;
+
+                get(icString);
+
+                icObject.id = icObject.id.join(" ");
+                icObject.className = icObject.className.join(" ");
+
+                return icObject;
+
+                function get (Code) {
+
+                    if (!Code) return;
+
+                    record = Code.match(spl_rex);
+
+                    if (record[1] === ".") {
+                        icObject.className.push(record[2])
+                    }else{
+                        icObject.id.push(record[2]);
+                    }
+                    record = Code.replace(record[0],"");
+
+                    get (record);
+                }
+            }
+
+            function getClassIdText (value,att) {
+                return Boolean(value)?' ' + att +'=' + '"'+ value + '"' + ' ':'';
+            }
+
+            for (var i in code_location) {
+                temporary_obj = code_location[i];
+                for (var k = 0,length = temporary_obj.length;k < length;k += 1) {
+                    span_ele = d.createElement("span");
+                    folding = " ml" + i;
+                    ele_name = temporary_obj[k].eleName;
+                    span_ele.className = "mv-tag" + folding;
+                    temporary_text = get_class(temporary_obj[k].eleClassId);
+                    span_ele.innerText = "<" + ele_name
+                        + " "
+                        + getClassIdText(temporary_text.className,"class")
+                        + getClassIdText(temporary_text.id,"id")
+                        + temporary_obj[k].eleAttribute
+                        + (ele_name === "input" || ele_name === "img" ? "/>" :">");
+
+                    if (!(ele_name === "input" || ele_name === "img")){
+                        temporary_arr.push(temporary_obj[k].eleName);
+                        folding_arr.push(folding);
+                    }
+
+                    framework.appendChild(span_ele);
+                }
+            }
+
+            for (var length = temporary_arr.length, i = length - 1; i > - 1 ;i -= 1) {
+                span_ele = d.createElement("span");
+                span_ele.className = "mv-tag" + folding_arr[i];
+                span_ele.innerText = "</" + temporary_arr[i] + ">";
+                framework.appendChild(span_ele);
+            }
+
+            which_ele.appendChild(framework);
+        }
+
     }
-    rule_parsing()("div.text#text > div.text1#text1 + div.text11#text11 > div.text2#text2 > div.text3#text3")
+
+    rule_parsing(document.body)('div.class[type="text"] > input.text[type="text"] + div.text');
+    rule_parsing(document.body)('div.class[type="text"] > input.text[type="text"] + div.text');
     exports.mv_code = rule_parsing;
 })(window);
 
-//([\[]*[^\]]*[\]]*)
+
+
+
