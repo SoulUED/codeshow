@@ -5,7 +5,7 @@
 (function (exports) {
     function rule_parsing (that) {
 
-        var rule_rex = /\s*([a-zA-Z0-9]*)([\.\#]*[a-zA-Z0-9\.\_\-\#]*)\[*([^\]\+>{}]*)\]*{*([^}\+>]*)}*\s*([>\+]*)/,
+        var rule_rex = /\s*([a-zA-Z0-9]*)([\.\#]*[a-zA-Z0-9\.\_\-\#]*)\[*([^\]\+>{}\s\^]*)\]*{*([^}\+>\^]*)}*\s*([>\+\^]*)/,
             pause_string,
             code_array = [],
             index = 0,
@@ -20,6 +20,7 @@
             }
 
             pause_string = code_string.match(rule_rex);
+            console.log(pause_string);
             code_array.push({});
             code_array[index].eleName = pause_string[1];
             code_array[index].eleClassId = pause_string[2];
@@ -40,10 +41,12 @@
             for (var i = 0,length = arr.length;i < length;i += 1) {
                 if (arr[i].eleLocation === ">") {
                     code_location["deep" + (k + 1)] = [];
-                    code_location["deep" + (k + 1)].push(arr[i + 1]);
+                    code_location["deep" + (k + 1)].push(arr[i+1]);
                     k+=1;
                 }else if(arr[i].eleLocation === "+"){
                     code_location["deep" + k].push(arr[i+1]);
+                }else if(arr[i].eleLocation === "^") {
+                    code_location["deep" + (k -1)].push(arr[i+1])
                 }
             }
             create_ele(code_location);
@@ -129,8 +132,11 @@
                 span_ele.innerText = "</" + temporary_arr[i] + ">";
                 framework.appendChild(span_ele);
             }
-
-            which_ele.appendChild(framework);
+            if (which_ele) {
+                which_ele.appendChild(framework);
+            }else{
+                return framework;
+            }
         }
 
     }
@@ -138,6 +144,9 @@
     exports.mv_code = rule_parsing;
 })(window);
 
+mv_code(document.body)("div.text1 + div.text6 > div.text2 + div.text4 > div.text5");
+
+/*
 mv_code($("#radio-btn")[0])('input[type="radio"] + input[type="radio checked="checked"]');
 mv_code($("#check-btn")[0])('input[type="checkbox"] + input[type="checkbox checked="checked"]');
 mv_code($("#list-box")[0])("div.mv-list-box{办公用品} > span");
@@ -154,4 +163,4 @@ mv_code($("#location-nav")[0])('p.mv-location-nav > span.mv-location-icon + a[hr
 mv_code($("#page-show")[0])('div.mv-tab{推广效果总览} + div.mv-tab-similarity{推广效果总览}');
 mv_code($("#message-box")[0])('div.mv-message-box > div.mv-message-box-head + div.mv-message-box-content');
 mv_code($("#message-box")[0])('div.mv-message-box-common > div.mv-message-box-head + div.mv-message-box-content');
-mv_code($("#load-state")[0])('div.mv-load-state > div.mv-load-ing > p{数据加载中} + div.mv-load > div.mv-load-style')
+mv_code($("#load-state")[0])('div.mv-load-state > div.mv-load-ing > p{数据加载中} + div.mv-load > div.mv-load-style');*/
